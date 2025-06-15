@@ -52,7 +52,7 @@ contract Stage {
                 sub(calldatasize(), 0x04) // @audit-notice: size to copy: this is actually the length of the arguments (calldatasize - selector size)
             )
 
-            // @audit-notice: this call is kind of tricky; what it does is that it passes the calldata of the initial function call made to this contract, but calls another function with it. the function being called is the one whose' selector is returned by the earlier `getSelector()` call
+            // @audit-notice: this call is kind of tricky; what it does is that it passes the calldata of the initial function call made to this contract, but calls another function with it. the function being called is the one whose selector is returned by the earlier `getSelector()` call
             switch call(
                 gas(), // gas passed to called contract :/
                 next, // @audit-notice: address to call; same as the address called earlier, but we're (hopefully) calling another function from the contract provided the `getSelector()` returned a different function selector other than `bytes4(keccak256("getSelector()"))`
@@ -200,6 +200,22 @@ contract Stage3 is Stage {
         return this.solve.selector;
     }
 
+    // test: 04 48 52 b2 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 2f 0a 03 ff 1b
+    // | 04| 04 48 52 b2 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ff 1b          => uint256(idx)
+
+    // CALLDATA -> 0xa4 (proposed offset for the next calldata copy)
+    // | 00| 3f 30 49 7e
+    // | 04| 04 48 52 b2 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ff 1b          => uint256(idx)
+    // | 24| 37 Od f2 09 98 cc 15 af b4 4c 28 79 a3 c1 62 c9 2e 70 3f c4 19 45 27 fb 6c cf 30 53 2c a1 dd 3b          => keys[0]
+    // | 44| 35 b3 £2 e2 ff 58 3f ed 98 ff 00 81 3d dc 7e b1 7a 0e bf c2 82 c0 11 94 6e 2c cb aa 9c d3 ee 67          => keys[1]
+    // | 64| 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00          => keys[2]
+    // | 84| 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00          => keys[3]
+    // | a4| 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00          => lock[0]
+    // | c4| 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00          => lock[1]
+
+    // | e4| 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00          => lock[2]
+    // |104| 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00          => lock[3]
+
     function solve(
         uint idx,
         uint[4] memory keys,
@@ -219,6 +235,7 @@ contract Stage3 is Stage {
             // `keys[0] < keys[0+1 -> 1] === true` AND
             // `keys[1] < keys[1+1 -> 2] === true` AND
             // `keys[2] < keys[2+1 -> 3] === true` AND
+            // TODO: continue from here
             require(keys[i] < keys[i + 1], "out of order");
         }
 
@@ -282,7 +299,7 @@ contract Stage5 is Stage {
     }
 
     function solve() public _ {
-        // this condition mandates that the calldata sent to this function must be less than `256`, else it will revert with "a little too long". This should not be too difficult seeing that this function is called in a new subcontext where a lot of the initial calldata has been trimmed down in the stages above
+        // this condition mandates that the calldata sent to this function must be less than `256`, else it will revert with "a little too long". This should not be too difficult seeing that this function is called in a new subcontext where a lot of the initial calldata has been trimmed down in the stages above. or is it?
         require(msg.data.length < 256, "a little too long");
 
         // @audit-notice: do not forget the `_` modifier in the function definition above. this callback loop will actually terminate here since the value of `next` is `address(0)`
