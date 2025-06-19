@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.4.24;
 
-// import {Test} from "forge-std/Test.sol";
 import {Entrypoint} from "../../src/2021/02.Lockbox.sol";
 
 contract SetupLockbox {
@@ -12,22 +11,29 @@ contract SetupLockbox {
     }
 
     function test_entrypoint() public {
-        bytes4 guess = bytes4(blockhash(block.number - 1));
         bool success = address(entrypoint).call(
             abi.encodePacked(
                 bytes4(keccak256("solve(bytes4)")),
-                guess,
+                bytes4(blockhash(block.number - 1)),
                 bytes26(0),
-                bytes1(0xff), // stage 2 - uint16(a.1)
-                // stage 1 -> v, r, s
-                uint8(27),
+                bytes1(0xff),
+                uint8(28),
                 bytes32(
                     0x370df20998cc15afb44c2879a3c162c92e703fc4194527fb6ccf30532ca1dd3b
                 ),
                 bytes32(
-                    0x35b3f2e2ff583fed98ff00813ddc7eb17a0ebfc282c011946e2ccbaa9cd3ee67
-                )
-                // stage 3 - currently stuck here
+                    0xca4c0d1d00a7c0126700ff7ec223814d40a01d242c888ea751a592e2336252da
+                ),
+                bytes32(
+                    uint256(
+                        0xca4c0d1d00a7c0126700ff7ec223814d40a01d242c888ea751a592e2336252da
+                    ) + uint256(0x02)
+                ),
+                keccak256(abi.encodePacked("choose")),
+                bytes32(
+                    0x370df20998cc15afb44c2879a3c162c92e703fc4194527fb6ccf30532ca1dd3b
+                ),
+                bytes32(uint256(0x0a))
             )
         );
 
