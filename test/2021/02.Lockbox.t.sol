@@ -6,11 +6,16 @@ import {Entrypoint} from "../../src/2021/02.Lockbox.sol";
 contract SetupLockbox {
     Entrypoint public entrypoint;
 
+    modifier checkIsSolved() {
+        _;
+        _isSolved();
+    }
+
     constructor() public {
         entrypoint = new Entrypoint();
     }
 
-    function test_entrypoint() public {
+    function test_entrypoint() public checkIsSolved {
         bool success = address(entrypoint).call(
             abi.encodePacked(
                 bytes4(keccak256("solve(bytes4)")),
@@ -40,7 +45,7 @@ contract SetupLockbox {
         require(success);
     }
 
-    function isSolved() public view returns (bool) {
+    function _isSolved() private view returns (bool) {
         return entrypoint.solved();
     }
 }
