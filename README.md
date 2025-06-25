@@ -12,4 +12,5 @@ My solutions to the [Paradigmxyz CTFs](https://ctf.paradigm.xyz/).
 
 - [Hello Challenge](https://medium.com/@dejijolaoluwa/paradigm-xyz-ctf-2021-hello-f9576d57ae6e)
 - [Lockbox Challenge](https://medium.com/@dejijolaoluwa/paradigm-xyz-ctf-2021-lockbox-part-1-47e398ced377)
-- Broker Challenge (🚧 work in progress)
+- [Broker Challenge](https://medium.com/@dejijolaoluwa/paradigm-xyz-ctf-2021-broker-0bf4b76717de)
+- Vault Challenge (🚧 work in progress)

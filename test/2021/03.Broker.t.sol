@@ -72,7 +72,6 @@ interface IUniswapV2Factory {
     ) external returns (address pair);
 }
 
-// https://0xrpc.io/eth
 contract SetupBroker is Script {
     using SafeMath for uint256;
 
