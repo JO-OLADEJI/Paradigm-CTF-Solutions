@@ -121,6 +121,7 @@ contract Broker {
     }
 
     // repay a user's loan and get back their collateral. no discounts.
+    // @audit-critical: neglets reducing the `user` deposit by the `collateralValueRepaid` which can be exploited in multiple ways later on
     function liquidate(address user, uint256 amount) public returns (uint256) {
         // requires loan to be undercollateralized before liquidation
         require(safeDebt(user) <= debt[user], "err: overcollateralized");
