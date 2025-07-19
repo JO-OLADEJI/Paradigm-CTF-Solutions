@@ -58,11 +58,8 @@ contract Vault is GuardConstants, EIP1167Factory {
     // @audit-info:                                                 STORAGE LAYOUT
     address public owner; //                                                  0x00
     address public pendingOwner; //                                           0x01
-
     GuardRegistry public registry; //                                         0x02
-
     Guard public guard; //                                                    0x03
-
     mapping(address => mapping(address => uint)) public balances; //          0x04
 
     // @audit-notice: `constructor()`
@@ -90,8 +87,8 @@ contract Vault is GuardConstants, EIP1167Factory {
         return guard;
     }
 
-    // check access
-    function checkAccess(string memory op) private returns (bool) {
+    // check access - 0xf6cc55f9
+    function checkAccess(string memory op) public returns (bool) {
         uint8 error;
         (error, ) = guard.isAllowed(msg.sender, op);
 
@@ -151,6 +148,6 @@ contract Vault is GuardConstants, EIP1167Factory {
     }
 }
 
-// I'm thinking to create a malicious contract that implements `ERC20Like` that executes arbirary code when `transferFrom()` or `transfer()` is called
-// Is it possible for me to `initialize()` the implementation contract used by `guard` and cause malicious things to happen?
-// can I manipulate the `returndatasize()` that `guard.isAllowed(msg.sender, op)` uses internally to manipulate it's return value?
+// I'm thinking I `selfdestruct` the implementation contract, but first I need to `initialize()` it with a malicious contract
+// subsequent calls to `checkAccess()` should always return true
+// then I call `emergencyCall` with my malicious contract as the `target` where I then set `owner()` to my address

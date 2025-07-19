@@ -4,11 +4,11 @@ import "../../src/2021/04.SingleOwnerGuard.sol";
 import "../../src/2021/04.GuardRegistry.sol";
 import "../../src/2021/04.Vault.sol";
 
-contract Setup {
+contract SetupVault {
     GuardRegistry public registry;
     Vault public vault;
 
-    function Setup() public {
+    function SetupVault() public {
         registry = new GuardRegistry();
         registry.registerGuardImplementation(new SingleOwnerGuard(), true);
 
